@@ -6,6 +6,9 @@ repositories {
 }
 
 dependencies {
+  compile 'org.projectlombok:lombok:1.16.4'
+  compile 'org.javafunk.funk:funk:0.2.0.39'
+
   testCompile 'junit:junit:4.12'
   testCompile 'org.hamcrest:hamcrest-all:1.3'
 }
