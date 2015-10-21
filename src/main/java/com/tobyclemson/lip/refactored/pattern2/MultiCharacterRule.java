@@ -7,7 +7,7 @@ public class MultiCharacterRule extends TypeBasedRule {
         super(tokenType);
     }
 
-    @Override public String extractFrom(LookaheadBuffer lookaheadBuffer) {
+    @Override public String extractFrom(LookaheadBuffer<Character> lookaheadBuffer) {
         StringBuilder buffer = new StringBuilder();
         do {
             buffer.append(lookaheadBuffer.getLookahead());

@@ -14,10 +14,10 @@ public abstract class TypeBasedRule implements LexerRule {
         return tokenType.isSatisfiedBy(lookaheadBuffer.getLookahead());
     }
 
-    @Override public Token apply(LookaheadBuffer lookaheadBuffer) {
+    @Override public Token apply(LookaheadBuffer<Character> lookaheadBuffer) {
         return tokenType.token(extractFrom(lookaheadBuffer));
     }
 
-    public abstract String extractFrom(LookaheadBuffer lookaheadBuffer);
+    public abstract String extractFrom(LookaheadBuffer<Character> lookaheadBuffer);
 }
 
