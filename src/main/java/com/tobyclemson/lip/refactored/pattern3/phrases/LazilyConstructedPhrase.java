@@ -1,7 +1,8 @@
-package com.tobyclemson.lip.refactored.pattern3;
+package com.tobyclemson.lip.refactored.pattern3.phrases;
 
 import com.tobyclemson.lip.refactored.common.LookaheadBuffer;
-import com.tobyclemson.lip.refactored.pattern2.Token;
+import com.tobyclemson.lip.refactored.common.Phrase;
+import com.tobyclemson.lip.refactored.common.Token;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;

@@ -1,6 +1,10 @@
-package com.tobyclemson.lip.refactored.pattern2;
+package com.tobyclemson.lip.refactored.pattern2.lexers;
 
 import com.tobyclemson.lip.refactored.common.LookaheadBuffer;
+import com.tobyclemson.lip.refactored.common.Token;
+import com.tobyclemson.lip.refactored.pattern2.Lexer;
+import com.tobyclemson.lip.refactored.pattern2.LexerRule;
+import com.tobyclemson.lip.refactored.pattern2.StringReader;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -22,6 +26,6 @@ public class RuleBasedLexer implements Lexer {
                 return rule.apply(lookaheadBuffer);
             }
         }
-        throw new Error("Invalid character: " + lookaheadBuffer.getLookahead());
+        throw new Error("Invalid character: " + lookaheadBuffer.lookahead());
     }
 }

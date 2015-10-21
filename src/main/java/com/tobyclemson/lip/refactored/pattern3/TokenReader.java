@@ -2,7 +2,7 @@ package com.tobyclemson.lip.refactored.pattern3;
 
 import com.tobyclemson.lip.refactored.common.Reader;
 import com.tobyclemson.lip.refactored.pattern2.Lexer;
-import com.tobyclemson.lip.refactored.pattern2.Token;
+import com.tobyclemson.lip.refactored.common.Token;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;

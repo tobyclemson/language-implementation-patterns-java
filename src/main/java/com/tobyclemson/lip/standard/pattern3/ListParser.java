@@ -24,7 +24,7 @@ public class ListParser extends Parser {
         }
     }
 
-    /** element : name | list ; // element is name or nested list */
+    /** element : NAME | list ; // element is NAME or nested list */
     void element() {
         if (lookahead.type == ListLexer.NAME) {
             match(ListLexer.NAME);

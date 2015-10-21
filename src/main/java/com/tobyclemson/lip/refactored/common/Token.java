@@ -1,4 +1,4 @@
-package com.tobyclemson.lip.refactored.pattern2;
+package com.tobyclemson.lip.refactored.common;
 
 import lombok.Value;
 

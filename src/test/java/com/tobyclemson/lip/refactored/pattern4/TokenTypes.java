@@ -1,38 +1,45 @@
-package com.tobyclemson.lip.refactored.pattern2;
+package com.tobyclemson.lip.refactored.pattern4;
 
-public enum TokenType {
-    NAME("NAME") {
-        /* NAME: ('a'..'z'|'A'..'Z')+ ; */
+import com.tobyclemson.lip.refactored.common.Token;
+import com.tobyclemson.lip.refactored.common.TokenType;
+import com.tobyclemson.lip.refactored.pattern2.Constants;
+
+public class TokenTypes {
+    public static final TokenType NAME = new TokenType("NAME") {
         @Override public boolean isSatisfiedBy(Character character) {
             return character >= 'a' && character <= 'z' ||
                     character >= 'A' && character <= 'Z';
         }
-    },
-    WHITESPACE("WHITESPACE") {
-        /* WHITESPACE : (' '|'\t'|'\n'|'\r')* ;  */
+    };
+    public static final TokenType WHITESPACE = new TokenType("WHITESPACE") {
         @Override public boolean isSatisfiedBy(Character character) {
             return character == ' ' ||
                     character == '\t' ||
                     character == '\n' ||
                     character == '\r';
         }
-    },
-    COMMA("COMMA") {
+    };
+    public static final TokenType COMMA = new TokenType("COMMA") {
         @Override public boolean isSatisfiedBy(Character character) {
             return character == ',';
         }
-    },
-    LBRACK("LBRACK") {
+    };
+    public static final TokenType EQUALS = new TokenType("EQUALS") {
+        @Override public boolean isSatisfiedBy(Character character) {
+            return character == '=';
+        }
+    };
+    public static final TokenType LBRACK = new TokenType("LBRACK") {
         @Override public boolean isSatisfiedBy(Character character) {
             return character == '[';
         }
-    },
-    RBRACK("RBRACK") {
+    };
+    public static final TokenType RBRACK = new TokenType("RBRACK") {
         @Override public boolean isSatisfiedBy(Character character) {
             return character == ']';
         }
-    },
-    EOF("<EOF>") {
+    };
+    public static final TokenType EOF = new TokenType("<EOF>") {
         @Override public boolean isSatisfiedBy(Character character) {
             return character == Constants.EOF_CHARACTER;
         }
@@ -41,24 +48,4 @@ public enum TokenType {
             return super.token("<EOF>");
         }
     };
-
-    private String name;
-
-    TokenType(String name) {
-        this.name = name;
-    }
-
-    public Token token(String text) {
-        return new Token(this, text);
-    }
-
-    public Token token(char character) {
-        return token(String.valueOf(character));
-    }
-
-    public abstract boolean isSatisfiedBy(Character character);
-
-    public String getName() {
-        return name;
-    }
 }

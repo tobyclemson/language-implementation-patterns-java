@@ -1,14 +1,18 @@
 package com.tobyclemson.lip.refactored.pattern2;
 
-import com.tobyclemson.lip.support.Lexers;
+import com.tobyclemson.lip.refactored.common.Token;
+import com.tobyclemson.lip.refactored.pattern2.lexers.FilteringLexer;
+import com.tobyclemson.lip.refactored.pattern2.lexers.RuleBasedLexer;
+import com.tobyclemson.lip.refactored.pattern2.rules.MultiCharacterRule;
+import com.tobyclemson.lip.refactored.pattern2.rules.SingleCharacterRule;
 import org.javafunk.funk.Literals;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.tobyclemson.lip.refactored.pattern2.TokenType.*;
 import static org.hamcrest.Matchers.is;
+import static org.javafunk.funk.Literals.iterableWith;
 import static org.junit.Assert.assertThat;
 
 public class Pattern2Test {
@@ -23,14 +27,14 @@ public class Pattern2Test {
     public void tokenisesListOfDepthOneUsingListGrammar() {
         // Given
         String input = "[a, b ]";
-        Lexer lexer = Lexers.listLexerFor(input);
+        Lexer lexer = listLexerFor(input);
         List<Token> expectedTokens = Literals.listWith(
-                new Token(LBRACK, "["),
-                new Token(NAME, "a"),
-                new Token(COMMA, ","),
-                new Token(NAME, "b"),
-                new Token(RBRACK, "]"),
-                new Token(EOF, "<EOF>"));
+                new Token(TokenTypes.LBRACK, "["),
+                new Token(TokenTypes.NAME, "a"),
+                new Token(TokenTypes.COMMA, ","),
+                new Token(TokenTypes.NAME, "b"),
+                new Token(TokenTypes.RBRACK, "]"),
+                new Token(TokenTypes.EOF, "<EOF>"));
 
         // When
         List<Token> actualTokens = tokensFrom(lexer);
@@ -43,25 +47,25 @@ public class Pattern2Test {
     public void tokenisesNestedListsUsingListGrammar() {
         // Given
         String input = "[ant, [bear, [cat]], dog]";
-        Lexer lexer = Lexers.listLexerFor(input);
+        Lexer lexer = listLexerFor(input);
 
-        Token leftBracket = new Token(LBRACK, "[");
-        Token rightBracket = new Token(RBRACK, "]");
-        Token comma = new Token(COMMA, ",");
-        Token endOfFile = new Token(EOF, "<EOF>");
+        Token leftBracket = new Token(TokenTypes.LBRACK, "[");
+        Token rightBracket = new Token(TokenTypes.RBRACK, "]");
+        Token comma = new Token(TokenTypes.COMMA, ",");
+        Token endOfFile = new Token(TokenTypes.EOF, "<EOF>");
         List<Token> expectedTokens = Literals.listWith(
                 leftBracket,
-                new Token(NAME, "ant"),
+                new Token(TokenTypes.NAME, "ant"),
                 comma,
                 leftBracket,
-                new Token(NAME, "bear"),
+                new Token(TokenTypes.NAME, "bear"),
                 comma,
                 leftBracket,
-                new Token(NAME, "cat"),
+                new Token(TokenTypes.NAME, "cat"),
                 rightBracket,
                 rightBracket,
                 comma,
-                new Token(NAME, "dog"),
+                new Token(TokenTypes.NAME, "dog"),
                 rightBracket,
                 endOfFile);
 
@@ -75,12 +79,32 @@ public class Pattern2Test {
     private List<Token> tokensFrom(Lexer lexer) {
         List<Token> tokens = new ArrayList<Token>();
         Token token = lexer.nextToken();
-        while (token.type != EOF) {
+        while (token.type != TokenTypes.EOF) {
             tokens.add(token);
             token = lexer.nextToken();
         }
         tokens.add(token);
         return tokens;
+    }
+
+    public Lexer listLexerFor(String input) {
+        LexerRule eofRule = new SingleCharacterRule(TokenTypes.EOF);
+        LexerRule whitespaceRule = new MultiCharacterRule(TokenTypes.WHITESPACE);
+        LexerRule commaRule = new SingleCharacterRule(TokenTypes.COMMA);
+        LexerRule leftBracketRule = new SingleCharacterRule(TokenTypes.LBRACK);
+        LexerRule rightBracketRule = new SingleCharacterRule(TokenTypes.RBRACK);
+        LexerRule nameRule = new MultiCharacterRule(TokenTypes.NAME);
+
+        return new FilteringLexer(
+                TokenTypes.WHITESPACE,
+                new RuleBasedLexer(input,
+                        iterableWith(
+                                eofRule,
+                                whitespaceRule,
+                                commaRule,
+                                leftBracketRule,
+                                rightBracketRule,
+                                nameRule)));
     }
 
 }
