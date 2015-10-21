@@ -1,6 +1,5 @@
 package com.tobyclemson.lip.standard.pattern2;
 
-import com.tobyclemson.lip.standard.pattern2.ListLexer;
 import org.junit.Test;
 
 public class Pattern2Test {
