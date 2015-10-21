@@ -6,12 +6,11 @@ import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class Parser {
-    Lexer input;
-    protected @NonFinal Token[] lookahead;
-    int k;
-    @NonFinal int p = 0;
+    private final Lexer input;
+    protected Token[] lookahead;
+    private int k;
+    private int p = 0;
 
     public Parser(Lexer input, int k) {
         this.input = input;
