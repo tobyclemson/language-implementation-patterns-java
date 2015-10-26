@@ -9,7 +9,7 @@ public class Pattern4Test {
      * element  : NAME '=' NAME | NAME | list ; // element is assignment, name or nested list
      * NAME     : ('a'..'z'|'A'..'Z')+ ;        // NAME is sequence of >=1 letter
      */
-    @Test public void tokenisesListGrammar() {
+    @Test public void parsesCorrectly() {
         String input = "[a,b=c,[d,e]]";
         LookaheadLexer lexer = new LookaheadLexer(input);
         LookaheadParser parser = new LookaheadParser(lexer, 2);

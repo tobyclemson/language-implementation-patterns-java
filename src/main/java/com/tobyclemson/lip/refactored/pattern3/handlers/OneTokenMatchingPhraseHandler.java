@@ -4,6 +4,8 @@ import com.tobyclemson.lip.refactored.common.LookaheadBuffer;
 import com.tobyclemson.lip.refactored.common.PhraseHandler;
 import com.tobyclemson.lip.refactored.common.Token;
 import com.tobyclemson.lip.refactored.common.TokenType;
+import com.tobyclemson.lip.refactored.pattern3.exceptions.MismatchedTokenException;
+import com.tobyclemson.lip.refactored.pattern3.exceptions.RecognitionException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -18,7 +20,7 @@ public class OneTokenMatchingPhraseHandler implements PhraseHandler {
         if (lookaheadToken.isOfType(expectedTokenType)) {
             lookaheadBuffer.advance();
         } else {
-            throw new Error(
+            throw new MismatchedTokenException(
                     "expecting " + expectedTokenType.getName() +
                             "; found " + lookaheadToken.getTypeName());
         }

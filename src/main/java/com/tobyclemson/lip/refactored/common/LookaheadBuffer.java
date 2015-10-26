@@ -2,26 +2,19 @@ package com.tobyclemson.lip.refactored.common;
 
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
-import org.javafunk.funk.Eagerly;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class LookaheadBuffer<T> {
     Reader<T> reader;
-    CircularQueue<T> lookahead;
+    MarkReleaseBuffer<T> lookahead;
 
     public LookaheadBuffer(Reader<T> reader) {
-        this(1, reader);
-    }
-
-    public LookaheadBuffer(Integer maximumLookahead, Reader<T> reader) {
         this.reader = reader;
-        this.lookahead = new CircularQueue<>(maximumLookahead);
-        Eagerly.times(maximumLookahead, i -> lookahead.push(reader.readNext()));
+        this.lookahead = new MarkReleaseBuffer<>(reader);
     }
 
     public void advance() {
-        lookahead.pop();
-        lookahead.push(reader.readNext());
+        lookahead.advance();
     }
 
     public T lookahead() {
@@ -30,5 +23,17 @@ public class LookaheadBuffer<T> {
 
     public T lookahead(Integer by) {
         return lookahead.peek(by - 1);
+    }
+
+    public void mark() {
+        lookahead.mark();
+    }
+
+    public void release() {
+        lookahead.release();
+    }
+
+    public boolean isMarked() {
+        return lookahead.isMarked();
     }
 }

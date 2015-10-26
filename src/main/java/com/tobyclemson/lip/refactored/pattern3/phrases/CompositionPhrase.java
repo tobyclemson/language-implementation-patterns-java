@@ -8,10 +8,16 @@ import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.javafunk.funk.Eagerly;
 
+import static org.javafunk.funk.Literals.iterableFrom;
+
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class CompositionPhrase implements Phrase {
     Iterable<Phrase> phrases;
+
+    public CompositionPhrase(Phrase... phrases) {
+        this(iterableFrom(phrases));
+    }
 
     @Override public boolean isSelectedBy(LookaheadBuffer<Token> lookaheadBuffer) {
         return Eagerly.first(phrases)

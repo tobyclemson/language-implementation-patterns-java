@@ -6,6 +6,7 @@ import com.tobyclemson.lip.refactored.common.PhraseHandler;
 import com.tobyclemson.lip.refactored.common.PhraseSelector;
 import com.tobyclemson.lip.refactored.common.Token;
 import com.tobyclemson.lip.refactored.common.TokenType;
+import com.tobyclemson.lip.refactored.pattern3.exceptions.RecognitionException;
 import com.tobyclemson.lip.refactored.pattern3.handlers.OneTokenMatchingPhraseHandler;
 import com.tobyclemson.lip.refactored.pattern3.selectors.OneTokenPhraseSelector;
 import lombok.AccessLevel;
@@ -25,7 +26,7 @@ public class SingleTokenPhrase implements Phrase {
         return selector.isSelectedBy(lookaheadBuffer);
     }
 
-    @Override public void apply(LookaheadBuffer<Token> lookaheadBuffer) {
+    @Override public void apply(LookaheadBuffer<Token> lookaheadBuffer) throws RecognitionException {
         handler.apply(lookaheadBuffer);
     }
 }

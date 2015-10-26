@@ -9,7 +9,7 @@ public class Pattern2Test {
      * element  : NAME | list ;            // element is name or nested list
      * NAME     : ('a'..'z'|'A'..'Z')+ ;   // NAME is sequence of >=1 letter
      */
-    @Test public void tokenisesListGrammar() {
+    @Test public void lexesCorrectly() {
         String input = "[a, b ]";
         ListLexer lexer = new ListLexer(input);
         Token token = lexer.nextToken();

@@ -5,6 +5,7 @@ import com.tobyclemson.lip.refactored.common.Phrase;
 import com.tobyclemson.lip.refactored.common.PhraseHandler;
 import com.tobyclemson.lip.refactored.common.Token;
 import com.tobyclemson.lip.refactored.common.TokenType;
+import com.tobyclemson.lip.refactored.pattern3.exceptions.RecognitionException;
 import com.tobyclemson.lip.refactored.pattern3.handlers.OneTokenMatchingPhraseHandler;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;

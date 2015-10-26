@@ -1,32 +1,41 @@
-package com.tobyclemson.lip.refactored.pattern4;
+package com.tobyclemson.lip.refactored.pattern5;
 
 import com.tobyclemson.lip.refactored.common.LookaheadBuffer;
+import com.tobyclemson.lip.refactored.common.Phrase;
 import com.tobyclemson.lip.refactored.common.Token;
-import com.tobyclemson.lip.refactored.pattern2.*;
+import com.tobyclemson.lip.refactored.pattern2.Lexer;
+import com.tobyclemson.lip.refactored.pattern2.LexerRule;
 import com.tobyclemson.lip.refactored.pattern2.lexers.FilteringLexer;
 import com.tobyclemson.lip.refactored.pattern2.lexers.RuleBasedLexer;
 import com.tobyclemson.lip.refactored.pattern2.rules.MultiCharacterRule;
 import com.tobyclemson.lip.refactored.pattern2.rules.SingleCharacterRule;
-import com.tobyclemson.lip.refactored.pattern3.*;
+import com.tobyclemson.lip.refactored.pattern3.Parser;
+import com.tobyclemson.lip.refactored.pattern3.PhraseBasedParser;
+import com.tobyclemson.lip.refactored.pattern3.TokenReader;
+import com.tobyclemson.lip.refactored.pattern3.exceptions.RecognitionException;
 import com.tobyclemson.lip.refactored.pattern3.phrases.*;
 import com.tobyclemson.lip.refactored.pattern4.handlers.MultiTokenMatchingPhraseHandler;
 import com.tobyclemson.lip.refactored.pattern4.phrases.DelegatingPhrase;
 import com.tobyclemson.lip.refactored.pattern4.selectors.TwoTokenPhraseSelector;
+import com.tobyclemson.lip.refactored.pattern5.phrases.SpeculationPhrase;
+import com.tobyclemson.lip.refactored.pattern5.phrases.SpeculationSetPhrase;
 import org.junit.Test;
 
 import static org.javafunk.funk.Literals.iterableWith;
 
-public class Pattern4Test {
+public class Pattern5Test {
     /**
+     * stat     : list EOF | assign EOF ;
+     * assign   : list '=' list ;
      * list     : '[' elements ']' ;            // match bracketed list
      * elements : element (',' element)* ;      // match comma-separated list
-     * element  : NAME '=' NAME | NAME | list ; // element is assignment, name or nested list
-     * NAME     : ('a'..'z'|'A'..'Z')+ ;        // NAME is sequence of >=1 letter
+     * element  : NAME '=' NAME | NAME | list ; //element is name, nested list
      */
 
-    @Test public void parsesListOfDepthOneWithoutError() {
+    @Test
+    public void parsesParallelListAssignmentsWithoutError() {
         // Given
-        String input = "[a, b ]";
+        String input = "[ant, bear] = [cow, pig]";
         Parser parser = listParserFor(input);
 
         // When
@@ -35,31 +44,10 @@ public class Pattern4Test {
         // Then no exceptions are thrown
     }
 
-    @Test public void parsesNestedListsWithoutError() {
+    @Test(expected = RecognitionException.class)
+    public void throwsErrorForInvalidInput() {
         // Given
-        String input = "[ant, [bear, [cat]], dog]";
-        Parser parser = listParserFor(input);
-
-        // When
-        parser.parse();
-
-        // Then no exceptions are thrown
-    }
-
-    @Test public void parsesListAssignmentsWithoutError() {
-        // Given
-        String input = "[ant, bear=cat, dog]";
-        Parser parser = listParserFor(input);
-
-        // When
-        parser.parse();
-
-        // Then no exceptions are thrown
-    }
-
-    @Test public void parsesNestedListAssignmentsWithoutError() {
-        // Given
-        String input = "[ant, [bear=cat, cow=pig, [squirrel], dog]]";
+        String input = "[ant, bear], [cow, pig]";
         Parser parser = listParserFor(input);
 
         // When
@@ -95,33 +83,44 @@ public class Pattern4Test {
         TokenReader tokenReader = new TokenReader(lexer);
         LookaheadBuffer<Token> lookaheadBuffer = new LookaheadBuffer<>(tokenReader);
 
-        return new PhraseBasedParser(lookaheadBuffer, listPhrase().get());
+        Phrase equalsPhrase = new SingleTokenPhrase(TokenTypes.EQUALS);
+        Phrase eofPhrase = new SingleTokenPhrase(TokenTypes.EOF);
+        Phrase listPhrase = listPhrase().get();
+
+        /** assign : list '=' list ; // parallel assignment */
+        Phrase topLevelAssignmentPhrase = new CompositionPhrase(listPhrase, equalsPhrase, listPhrase);
+
+        /** stat : list EOF | assign EOF ; */
+        Phrase statementPhrase = new SpeculationSetPhrase(
+                new SpeculationPhrase(new CompositionPhrase(topLevelAssignmentPhrase, eofPhrase)),
+                new SpeculationPhrase(new CompositionPhrase(listPhrase, eofPhrase)));
+
+        return new PhraseBasedParser(lookaheadBuffer, statementPhrase);
     }
 
     private LazilyConstructedPhrase.Factory listPhrase() {
         return () -> {
-            SingleTokenPhrase leftBracketPhrase = new SingleTokenPhrase(TokenTypes.LBRACK);
-            SingleTokenPhrase rightBracketPhrase = new SingleTokenPhrase(TokenTypes.RBRACK);
-            SingleTokenPhrase namePhrase = new SingleTokenPhrase(TokenTypes.NAME);
-            DelegatingPhrase assignmentPhrase = new DelegatingPhrase(
+            Phrase leftBracketPhrase = new SingleTokenPhrase(TokenTypes.LBRACK);
+            Phrase rightBracketPhrase = new SingleTokenPhrase(TokenTypes.RBRACK);
+            Phrase namePhrase = new SingleTokenPhrase(TokenTypes.NAME);
+
+            Phrase nestedAssignmentPhrase = new DelegatingPhrase(
                     new TwoTokenPhraseSelector(TokenTypes.NAME, TokenTypes.EQUALS),
                     new MultiTokenMatchingPhraseHandler(TokenTypes.NAME, TokenTypes.EQUALS, TokenTypes.NAME));
 
             /** list : '[' elements ']' ; // match bracketed list */
-            LazilyConstructedPhrase listPhrase = new LazilyConstructedPhrase(listPhrase());
+            Phrase listPhrase = new LazilyConstructedPhrase(listPhrase());
 
             /** element : NAME '=' NAME | NAME | list ; assignment, NAME or list */
-            AlternationPhrase elementPhrase = new AlternationPhrase(
-                    iterableWith(
-                            assignmentPhrase,
-                            namePhrase,
-                            listPhrase));
+            Phrase elementPhrase = new AlternationPhrase(
+                    nestedAssignmentPhrase,
+                    namePhrase,
+                    listPhrase);
 
             /** elements : element (',' element)* ; */
-            RepetitionPhrase elementsPhrase = new RepetitionPhrase(elementPhrase, TokenTypes.COMMA);
+            Phrase elementsPhrase = new RepetitionPhrase(elementPhrase, TokenTypes.COMMA);
 
-            return new CompositionPhrase(
-                    iterableWith(leftBracketPhrase, elementsPhrase, rightBracketPhrase));
+            return new CompositionPhrase(leftBracketPhrase, elementsPhrase, rightBracketPhrase);
         };
     }
 }

@@ -10,7 +10,7 @@ public class Pattern3Test {
      * element  : NAME | list ;            // element is name or nested list
      * NAME     : ('a'..'z'|'A'..'Z')+ ;   // NAME is sequence of >=1 letter
      */
-    @Test public void tokenisesListGrammar() {
+    @Test public void parsesCorrectly() {
         String input = "[a,b, [d, e]]";
         ListLexer lexer = new ListLexer(input);
         ListParser parser = new ListParser(lexer);

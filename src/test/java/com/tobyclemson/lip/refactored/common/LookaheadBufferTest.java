@@ -21,6 +21,19 @@ public class LookaheadBufferTest {
     }
 
     @Test
+    public void providesManyElementsOfLookahead() {
+        // Given
+        LookaheadBuffer<Integer> lookaheadBuffer = new LookaheadBuffer<>(readerWith(1, 2, 3, 4, 5));
+        Integer expected = 3;
+
+        // When
+        Integer actual = lookaheadBuffer.lookahead(3);
+
+        // Then
+        assertThat(actual, is(expected));
+    }
+
+    @Test
     public void allowsLookaheadToBeAdvanced() {
         // Given
         LookaheadBuffer<Integer> lookaheadBuffer = new LookaheadBuffer<>(readerWith(1, 2, 3));
@@ -36,15 +49,62 @@ public class LookaheadBufferTest {
     }
 
     @Test
-    public void providesKElementsOfLookahead() {
+    public void allowsLookaheadToBeMarkedAndReleased() {
         // Given
-        LookaheadBuffer<Integer> lookaheadBuffer = new LookaheadBuffer<>(3, readerWith(1, 2, 3, 4, 5));
-        Integer expected = 3;
+        LookaheadBuffer<Integer> lookaheadBuffer = new LookaheadBuffer<>(readerWith(1, 2, 3, 4));
+        lookaheadBuffer.advance();
+        lookaheadBuffer.mark();
+        lookaheadBuffer.advance();
+        lookaheadBuffer.advance();
 
         // When
-        Integer actual = lookaheadBuffer.lookahead(3);
+        lookaheadBuffer.release();
+        Integer lookahead = lookaheadBuffer.lookahead(2);
 
         // Then
-        assertThat(actual, is(expected));
+        assertThat(lookahead, is(3));
+    }
+
+    @Test
+    public void returnsTrueForIsMarkedWhenMarkExists() {
+        // Given
+        LookaheadBuffer<Integer> lookaheadBuffer = new LookaheadBuffer<>(readerWith(1, 2, 3, 4));
+        lookaheadBuffer.advance();
+        lookaheadBuffer.mark();
+
+        // When
+        boolean marked = lookaheadBuffer.isMarked();
+
+        // Then
+        assertThat(marked, is(true));
+    }
+
+    @Test
+    public void returnsFalseForIsMarkedIfNeverMarked() {
+        // Given
+        LookaheadBuffer<Integer> lookaheadBuffer = new LookaheadBuffer<>(readerWith(1, 2, 3, 4));
+        lookaheadBuffer.advance();
+
+        // When
+        boolean marked = lookaheadBuffer.isMarked();
+
+        // Then
+        assertThat(marked, is(false));
+    }
+
+    @Test
+    public void returnsFalseForIsMarkedIfMarkedAndReleased() {
+        // Given
+        LookaheadBuffer<Integer> lookaheadBuffer = new LookaheadBuffer<>(readerWith(1, 2, 3, 4));
+        lookaheadBuffer.advance();
+        lookaheadBuffer.mark();
+        lookaheadBuffer.advance();
+        lookaheadBuffer.release();
+
+        // When
+        boolean marked = lookaheadBuffer.isMarked();
+
+        // Then
+        assertThat(marked, is(false));
     }
 }
