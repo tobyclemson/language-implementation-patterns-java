@@ -1,1 +1,1 @@
-Code examples and personal experiments whilst following along with "Language Implementation Patterns" by Terence Parr.
+Code examples and personal experiments in Java whilst following along with "Language Implementation Patterns" by Terence Parr.
